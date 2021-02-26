@@ -220,6 +220,7 @@ func AutoOffset(count ...int) *float64 {
 	return &avgMillis
 }
 
+//Snipe Snipes with config and sends response through the channel given.
 func Snipe(config Configuration, ch chan SnipeRes) {
 	time.Sleep(time.Until(config.Timestamp.Add(time.Millisecond * time.Duration(0-10000-config.Offset))))
 	recvd := make([]byte, 4096)
