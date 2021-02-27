@@ -4,4 +4,4 @@
 
 Read that 3 times, DO NOT OPEN AN ISSUE UNLESS IT INVOLVES THIS REPO.
 
-## [MCGoSnipe/Frontend](https://github.com/MCGoSnipe/Frontend) is the frontend.
+## [MCGoSnipe/Frontend](https://github.com/MCGoSnipe/Frontend) is the frontend. Go there for using this without coding.
