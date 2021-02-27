@@ -22,7 +22,7 @@ const (
 	MicrosoftLoginAPI = "https://login.live.com/oauth20_authorize.srf?client_id=9abe16f4-930f-4033-b593-6e934115122f&response_type=code&redirect_uri=https%3A%2F%2Fmicroauth.tk%2Ftoken&scope=XboxLive.signin%20XboxLive.offline_access"
 )
 
-//Configuration This struct holds configuration for
+//Configuration holds configuration for
 // the sniper to use.
 type Configuration struct {
 	Bearer    string
@@ -32,7 +32,7 @@ type Configuration struct {
 	Label     *string
 }
 
-//SnipeRes This contains the data obtained after the snipe.
+//SnipeRes contains the data obtained after the snipe.
 type SnipeRes struct {
 	Sent   *time.Time
 	Recv   *time.Time
@@ -75,7 +75,7 @@ type accessTokenResponse struct {
 	YggError    *string `json:"error"`
 }
 
-//TextToSliceStr This function will return a slice
+//TextToSliceStr will return a slice
 // of all the lines of the file, found at path, as strings.
 // Also returns the number of lines read.
 func TextToSliceStr(path string) ([]string, int) {
@@ -101,10 +101,11 @@ func TextToSliceStr(path string) ([]string, int) {
 	return make([]string, 0), 0
 }
 
-//SliceStrToBearers Returns a list of bearers from the input provided alongside the count of bearers.
-// This function also will automatically answer security questions if provided.
-func SliceStrToBearers(inputSlice []string) ([]string, int) {
+//SliceStrToBearers returns a list of bearers from the input provided alongside the count of bearers.
+// function also will automatically answer security questions if provided.
+func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 	outputSlice := make([]string, 0)
+	outputSlice2 := make([]string, 0)
 	i := 0
 	client := &http.Client{}
 	for _, input := range inputSlice {
@@ -144,6 +145,7 @@ func SliceStrToBearers(inputSlice []string) ([]string, int) {
 			continue
 		}
 		outputSlice = append(outputSlice, *access.AccessToken)
+		outputSlice2 = append(outputSlice2, splitLogin[0])
 		i++
 		if len(splitLogin) == 5 {
 			req, err = http.NewRequest("GET", "https://api.mojang.com/user/security/challenges", nil)
@@ -173,10 +175,10 @@ func SliceStrToBearers(inputSlice []string) ([]string, int) {
 			client.Do(req)
 		}
 	}
-	return outputSlice, i
+	return outputSlice, outputSlice2, i
 }
 
-//GetDropTime Gets the time.Time of when the inputted name drops. Returns nil upon error.
+//GetDropTime gets the time.Time of when the inputted name drops. Returns nil upon error.
 func GetDropTime(name string) *time.Time {
 	res, err := http.Get("https://api.nathan.cx/check/" + name)
 	if err != nil {
@@ -220,7 +222,7 @@ func AutoOffset(count ...int) *float64 {
 	return &avgMillis
 }
 
-//Snipe Snipes with config and sends response through the channel given.
+//Snipe snipes with config and sends response through the channel given.
 func Snipe(config Configuration, ch chan SnipeRes) {
 	time.Sleep(time.Until(config.Timestamp.Add(time.Millisecond * time.Duration(0-10000-config.Offset))))
 	recvd := make([]byte, 4096)
