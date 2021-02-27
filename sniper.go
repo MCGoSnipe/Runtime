@@ -141,7 +141,7 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 		}
 		var access accessTokenResponse
 		err = json.Unmarshal(respData, &access)
-		if err != nil {
+		if err != nil || access.AccessToken == nil {
 			continue
 		}
 		outputSlice = append(outputSlice, *access.AccessToken)
