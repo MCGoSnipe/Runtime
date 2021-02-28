@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -30,6 +31,7 @@ type Configuration struct {
 	Offset    float64
 	Timestamp time.Time
 	Label     *string
+	Debug     bool
 }
 
 //SnipeRes contains the data obtained after the snipe.
@@ -218,6 +220,7 @@ func AutoOffset(count ...int) *float64 {
 		duration := time.Now().Sub(time1)
 		sumNanos += duration.Nanoseconds()
 	}
+	conn.Close()
 	avgMillis := float64(sumNanos) / float64(1000000)
 	return &avgMillis
 }
@@ -228,6 +231,9 @@ func Snipe(config Configuration, ch chan SnipeRes) {
 	recvd := make([]byte, 4096)
 	conn, err := tls.Dial("tls", MinecraftServicesAPIHost+":443", nil)
 	if err != nil {
+		if config.Debug {
+			fmt.Printf("\033[0;31m" + err.Error() + "\033[0m\n")
+		}
 		ch <- SnipeRes{}
 		return
 	}
@@ -237,6 +243,7 @@ func Snipe(config Configuration, ch chan SnipeRes) {
 	conn.Write([]byte("\r\n"))
 	sent := time.Now()
 	conn.Read(recvd)
+	conn.Close()
 	recv := time.Now()
 	code, _ := strconv.Atoi(string(recvd[9:12]))
 	ch <- SnipeRes{
