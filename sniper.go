@@ -229,6 +229,7 @@ func Snipe(config Configuration, ch chan SnipeRes) {
 	conn, err := tls.Dial("tls", MinecraftServicesAPIHost+":443", nil)
 	if err != nil {
 		ch <- SnipeRes{}
+		return
 	}
 	payload := "PUT /minecraft/profile/name/" + config.Name + " HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer " + config.Bearer + "\r\n"
 	conn.Write([]byte(payload))
