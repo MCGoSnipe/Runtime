@@ -229,10 +229,13 @@ func AutoOffset(count ...int) *float64 {
 func Snipe(config Configuration, ch chan SnipeRes) {
 	time.Sleep(time.Until(config.Timestamp.Add(time.Millisecond * time.Duration(0-10000-config.Offset))))
 	recvd := make([]byte, 4096)
-	conn, err := tls.Dial("tls", MinecraftServicesAPIHost+":443", nil)
+	conn, err := tls.Dial("tcp", MinecraftServicesAPIHost+":443", nil)
 	if err != nil {
 		if config.Debug {
-			fmt.Printf("\033[0;31m" + err.Error() + "\033[0m\n")
+
+			fmt.Print("\033[0;31m")
+			fmt.Print(err)
+			fmt.Print("\033[0m\n")
 		}
 		ch <- SnipeRes{}
 		return
