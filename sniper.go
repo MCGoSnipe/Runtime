@@ -242,7 +242,7 @@ func Snipe(config Configuration, ch chan SnipeRes) {
 	}
 	payload := "PUT /minecraft/profile/name/" + config.Name + " HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer " + config.Bearer + "\r\n"
 	conn.Write([]byte(payload))
-	time.Sleep(time.Until(config.Timestamp))
+	time.Sleep(time.Until(config.Timestamp.Add(time.Millisecond * time.Duration(0-config.Offset))))
 	conn.Write([]byte("\r\n"))
 	sent := time.Now()
 	conn.Read(recvd)
