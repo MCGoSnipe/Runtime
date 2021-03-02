@@ -206,17 +206,16 @@ func AutoOffset(count ...int) *float64 {
 	if len(count) > 0 {
 		c = count[0]
 	}
-	payload := "PUT /minecraft/profile/name/test HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer TestToken" + "\r\n\r\n"
-	conn, err := tls.Dial("tls", MinecraftServicesAPIHost+":443", nil)
+	payload := "PUT /minecraft/profile/name/test HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer TestToken" + "\r\n"
+	conn, err := tls.Dial("tcp", MinecraftServicesAPIHost+":443", nil)
 	if err != nil {
 		return nil
 	}
 	sumNanos := int64(0)
 	for i := 0; i < c; i++ {
-		junk := make([]byte, 4096)
-		time1 := time.Now()
 		conn.Write([]byte(payload))
-		conn.Read(junk)
+		time1 := time.Now()
+		conn.Write([]byte("\r\n"))
 		duration := time.Now().Sub(time1)
 		sumNanos += duration.Nanoseconds()
 	}
