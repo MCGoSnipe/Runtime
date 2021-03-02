@@ -73,7 +73,7 @@ type accessTokenRequest struct {
 }
 
 type accessTokenResponse struct {
-	AccessToken *string `json:"access_token"`
+	AccessToken *string `json:"accessToken"`
 	YggError    *string `json:"error"`
 }
 
