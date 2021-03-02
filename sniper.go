@@ -224,7 +224,7 @@ func AutoOffset(count ...int) *float64 {
 		sumNanos += duration.Nanoseconds()
 	}
 	conn.Close()
-	avgMillis := float64(sumNanos)/float64(1000000) + float64(35)
+	avgMillis := float64(sumNanos)/float64(1000000) + float64(25)
 	return &avgMillis
 }
 
