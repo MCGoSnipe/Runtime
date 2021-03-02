@@ -149,33 +149,37 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 		outputSlice = append(outputSlice, *access.AccessToken)
 		outputSlice2 = append(outputSlice2, splitLogin[0])
 		i++
-		if len(splitLogin) == 5 {
-			req, err = http.NewRequest("GET", "https://api.mojang.com/user/security/challenges", nil)
-			if err != nil {
-				continue
-			}
-			req.Header.Set("Authorization", "Bearer "+*access.AccessToken)
-			res, err = client.Do(req)
-			if err != nil {
-				continue
-			}
-			respData, err = ioutil.ReadAll(res.Body)
-			if err != nil {
-				continue
-			}
-			var security []securityRes
-			err = json.Unmarshal(respData, &security)
-			if err != nil {
-				continue
-			}
-			dataBytes := []byte(`[{"id": ` + strconv.Itoa(security[0].Answer.ID) + `, "answer": "` + splitLogin[2] + `"}, {"id": ` + strconv.Itoa(security[1].Answer.ID) + `, "answer": "` + splitLogin[3] + `"}, {"id": ` + strconv.Itoa(security[2].Answer.ID) + `, "answer": "` + splitLogin[4] + `"}]`)
-			req, err = http.NewRequest("POST", "https://api.mojang.com/user/security/location", bytes.NewReader(dataBytes))
-			if err != nil {
-				continue
-			}
-			req.Header.Set("Authorization", "Bearer "+*access.AccessToken)
-			client.Do(req)
+		if len(splitLogin) != 5 {
+			continue
 		}
+		req, err = http.NewRequest("GET", "https://api.mojang.com/user/security/challenges", nil)
+		if err != nil {
+			continue
+		}
+		req.Header.Set("Authorization", "Bearer "+*access.AccessToken)
+		res, err = client.Do(req)
+		if err != nil {
+			continue
+		}
+		respData, err = ioutil.ReadAll(res.Body)
+		if err != nil {
+			continue
+		}
+		var security []securityRes
+		err = json.Unmarshal(respData, &security)
+		if err != nil {
+			continue
+		}
+		if len(security) != 3 {
+			continue
+		}
+		dataBytes := []byte(`[{"id": ` + strconv.Itoa(security[0].Answer.ID) + `, "answer": "` + splitLogin[2] + `"}, {"id": ` + strconv.Itoa(security[1].Answer.ID) + `, "answer": "` + splitLogin[3] + `"}, {"id": ` + strconv.Itoa(security[2].Answer.ID) + `, "answer": "` + splitLogin[4] + `"}]`)
+		req, err = http.NewRequest("POST", "https://api.mojang.com/user/security/location", bytes.NewReader(dataBytes))
+		if err != nil {
+			continue
+		}
+		req.Header.Set("Authorization", "Bearer "+*access.AccessToken)
+		client.Do(req)
 	}
 	return outputSlice, outputSlice2, i
 }
