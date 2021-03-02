@@ -81,7 +81,7 @@ type accessTokenResponse struct {
 // of all the lines of the file, found at path, as strings.
 // Also returns the number of lines read.
 func TextToSliceStr(path string) ([]string, int) {
-	file, err := os.Open("./accounts.txt")
+	file, err := os.Open(path)
 	i := 0
 	if err == nil {
 		var txtSlice []string
