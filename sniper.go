@@ -218,15 +218,16 @@ func AutoOffset(count ...int) *float64 {
 	sumNanos := int64(0)
 	for i := 0; i < c; i++ {
 		junk := make([]byte, 4096)
-		conn.Write([]byte(payload))
 		time1 := time.Now()
+		conn.Write([]byte(payload))
 		conn.Write([]byte("\r\n"))
 		conn.Read(junk)
 		duration := time.Now().Sub(time1)
 		sumNanos += duration.Nanoseconds()
 	}
 	conn.Close()
-	avgMillis := float64(sumNanos)/float64(1000000) + float64(25)
+	sumNanos /= int64(c)
+	avgMillis := float64(sumNanos)/float64(1000000) - float64(100)
 	return &avgMillis
 }
 
