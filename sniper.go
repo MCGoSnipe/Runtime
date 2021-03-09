@@ -112,6 +112,9 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 	client := &http.Client{}
 	for _, input := range inputSlice {
 		splitLogin := strings.Split(input, ":")
+		if len(splitLogin) < 2 {
+			continue
+		}
 		data := accessTokenRequest{
 			Agent: yggAgent{
 				Name:    "Minecraft",
@@ -209,6 +212,9 @@ func AutoOffset(count ...int) *float64 {
 	c := 3
 	if len(count) > 0 {
 		c = count[0]
+	}
+	if c < 1 {
+		c = 3
 	}
 	payload := "PUT /minecraft/profile/name/test HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer TestToken" + "\r\n"
 	conn, err := tls.Dial("tcp", MinecraftServicesAPIHost+":443", nil)
