@@ -20,7 +20,7 @@ const (
 	//YggdrasilAuthURI The URI for Mojang's authentication server.
 	YggdrasilAuthURI = "https://authserver.mojang.com"
 	//MicrosoftLoginAPI The URI for logging in to a Microsoft account for Minecraft via MicroAuth.
-	MicrosoftLoginAPI = "https://login.live.com/oauth20_authorize.srf?client_id=9abe16f4-930f-4033-b593-6e934115122f&response_type=code&redirect_uri=https%3A%2F%2Fmicroauth.tk%2Ftoken&scope=XboxLive.signin%20XboxLive.offline_access"
+	MicrosoftLoginAPI = "https://login.live.com/oauth20_authorize.srf?client_id=9abe16f4-930f-4033-b593-6e934115122f&response_type=code&redirect_uri=https%3A%2F%2Fapi.gosnipe.tech%2Fapi%2Fauthenticate&scope=XboxLive.signin%20XboxLive.offline_access"
 )
 
 //Configuration holds configuration for
@@ -44,8 +44,8 @@ type SnipeRes struct {
 
 // Internal structs here
 
-type nxAPIRes struct {
-	DropTime string `json:"drop_time"`
+type dropAPIRes struct {
+	DropTime string `json:"time"`
 }
 
 type securityRes struct {
@@ -112,6 +112,9 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 	client := &http.Client{}
 	for _, input := range inputSlice {
 		splitLogin := strings.Split(input, ":")
+		if len(splitLogin) < 2 {
+			continue
+		}
 		data := accessTokenRequest{
 			Agent: yggAgent{
 				Name:    "Minecraft",
@@ -186,7 +189,7 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 
 //GetDropTime gets the time.Time of when the inputted name drops. Returns nil upon error.
 func GetDropTime(name string) *time.Time {
-	res, err := http.Get("https://api.nathan.cx/check/" + name)
+	res, err := http.Get("https://api.gosnipe.tech/api/status/name/" + name)
 	if err != nil {
 		return nil
 	}
@@ -194,10 +197,10 @@ func GetDropTime(name string) *time.Time {
 	if err != nil {
 		return nil
 	}
-	var nxres nxAPIRes
+	var dropres dropAPIRes
 	res.Body.Close()
-	json.Unmarshal(apiRes, &nxres)
-	timestamp, err := time.Parse(time.RFC3339, nxres.DropTime)
+	json.Unmarshal(apiRes, &dropres)
+	timestamp, err := time.Parse(time.RFC3339, dropres.DropTime)
 	if err != nil {
 		return nil
 	}
@@ -210,6 +213,9 @@ func AutoOffset(count ...int) *float64 {
 	if len(count) > 0 {
 		c = count[0]
 	}
+	if c < 1 {
+		c = 3
+	}
 	payload := "PUT /minecraft/profile/name/test HTTP/1.1\r\nHost: api.minecraftservices.com\r\nAuthorization: Bearer TestToken" + "\r\n"
 	conn, err := tls.Dial("tcp", MinecraftServicesAPIHost+":443", nil)
 	if err != nil {
@@ -218,8 +224,8 @@ func AutoOffset(count ...int) *float64 {
 	sumNanos := int64(0)
 	for i := 0; i < c; i++ {
 		junk := make([]byte, 4096)
-		time1 := time.Now()
 		conn.Write([]byte(payload))
+		time1 := time.Now()
 		conn.Write([]byte("\r\n"))
 		conn.Read(junk)
 		duration := time.Now().Sub(time1)
@@ -227,7 +233,7 @@ func AutoOffset(count ...int) *float64 {
 	}
 	conn.Close()
 	sumNanos /= int64(c)
-	avgMillis := float64(sumNanos)/float64(1000000) - float64(100)
+	avgMillis := float64(sumNanos)/float64(1000000) - float64(125)
 	return &avgMillis
 }
 
