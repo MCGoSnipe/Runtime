@@ -255,10 +255,15 @@ func Snipe(config Configuration, ch chan SnipeRes) {
 	conn.Close()
 	recv := time.Now()
 	code, _ := strconv.Atoi(string(recvd[9:12]))
+	label := config.Name
+	if config.Label != nil {
+		label += "@" + *config.Label
+	}
+
 	ch <- SnipeRes{
 		Sent:   &sent,
 		Recv:   &recv,
 		Status: &code,
-		Label:  config.Label,
+		Label:  &label,
 	}
 }
