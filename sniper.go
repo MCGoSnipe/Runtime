@@ -61,15 +61,9 @@ type msaRes struct {
 	MSAError    *string `json:"error"`
 }
 
-type yggAgent struct {
-	Name    string `json:"name"`
-	Version int    `json:"version"`
-}
-
 type accessTokenRequest struct {
-	Username string   `json:"username"`
-	Password string   `json:"password"`
-	Agent    yggAgent `json:"agent"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type accessTokenResponse struct {
@@ -116,10 +110,6 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 			continue
 		}
 		data := accessTokenRequest{
-			Agent: yggAgent{
-				Name:    "Minecraft",
-				Version: 1,
-			},
 			Username: splitLogin[0],
 			Password: splitLogin[1],
 		}
@@ -149,9 +139,6 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 		if err != nil || access.AccessToken == nil {
 			continue
 		}
-		outputSlice = append(outputSlice, *access.AccessToken)
-		outputSlice2 = append(outputSlice2, splitLogin[0])
-		i++
 		if len(splitLogin) != 5 {
 			continue
 		}
@@ -183,6 +170,9 @@ func SliceStrToBearers(inputSlice []string) ([]string, []string, int) {
 		}
 		req.Header.Set("Authorization", "Bearer "+*access.AccessToken)
 		client.Do(req)
+		outputSlice = append(outputSlice, *access.AccessToken)
+		outputSlice2 = append(outputSlice2, splitLogin[0])
+		i++
 	}
 	return outputSlice, outputSlice2, i
 }
